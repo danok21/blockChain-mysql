@@ -51,7 +51,7 @@ async fn main() -> web3::Result<()> {
         let mix_hash = "null";
         let nonce = "null";
         println!("{:?}",seal_fields);
-        let tx = eth_block["transactions"].as_array().unwrap();//
+        let tx = eth_block["transactions"].as_array().unwrap();
 
         //block_tx
         for i in tx {

@@ -18,18 +18,22 @@ async fn main() -> web3::Result<()> {
         let web3 = web3::Web3::new(transport);
 
         let mut block_num = web3.eth().block_number().await?;
-        let mut i = 0;
-    while {
-        println!("The number of the most recent block is : {:?}", block_num);
-        let block_data = web3.eth().block_with_txs(BlockId::Number(BlockNumber::Number(U64::from(block_num)))).await?;
-        println!("The {:?} block data is： {:?}", block_num, block_data);
-        let mut text = File::create("./test.txt").expect("create failed");
-        write!(text, "{:?}", block_data).expect("write failed");//Write into file.
+        let block_str = block_num.to_string();
+        let block_number = block_str.parse::<i64>().unwrap();
 
-        if let Some(data) = block_data {
-            let mut eth_block = serde_json::to_value(&data).unwrap();
+        let mut n: i64 = 1;
+
+        println!("The number of the most recent block is : {:?}", block_num);
+        //let mut block_data = web3.eth().block_with_txs(BlockId::Number(BlockNumber::Number(U64::from(block_number)))).await?;
+        //println!("The {:?} block data is： {:?}", block_number, block_data);
+        //let mut text = File::create("./test.txt").expect("create failed");
+        //write!(text, "{:?}", block_data).expect("write failed");//Write into file.
+    loop {
+        let mut block_data = web3.eth().block_with_txs(BlockId::Number(BlockNumber::Number(U64::from(n)))).await?;
+        if let Some(data) = &mut block_data {
+            let mut eth_block = serde_json::to_value(data).unwrap();
             //let mut json = serde_json::to_string_pretty(&data).unwrap();
-            // println!("{}", json);
+            //println!("{}", json);
 
             //block_head
             let hash = eth_block["hash"].as_str().unwrap();
@@ -58,7 +62,7 @@ async fn main() -> web3::Result<()> {
 
             //block_tx
             for i in tx {
-                println!("{}", i);//Get single tx data.
+               // println!("{}", i);//Get single tx data.
 
                 let hash_tx = i["hash"].as_str().unwrap();
                 let nonce = i["nonce"].as_str().unwrap();
@@ -80,21 +84,21 @@ async fn main() -> web3::Result<()> {
                 let mut count = sqlx::query(sql).bind(hash_tx).bind(nonce).bind(block_hash).bind(block_number).bind(transaction_index).bind(from_addr)
                     .bind(to_addr).bind(value).bind(gas_price).bind(gas).bind(input).bind(v).bind(r).bind(s)
                     .bind(raw).execute(&mut pool).await.unwrap();
-                println!("Add {} records to the Tx table successfully! ", count);
+                //println!("Add {} records to the Tx table successfully! ", count);
             }
 
             let sql2 = "INSERT INTO Head VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             let count2 = sqlx::query(sql2).bind(hash).bind(parent_hash).bind(sha3_uncles).bind(miner).bind(state_root).bind(transactions_root)
                 .bind(receipts_root).bind(number).bind(gas_used).bind(gas_limit).bind(base_fee_per_gas).bind(extra_data).bind(logs_bloom).bind(timestamp)
                 .bind(difficulty).bind(total_difficulty).bind(transactions).bind(size).bind(mix_hash).bind(nonce).execute(&mut pool).await.unwrap();
-            println!("Add {} records to the Head table successfully! ", count2);
+              //println!("Add {} records to the Head table successfully! ", count2);
         }
 
-        if i == block_num {
+        if n == block_number {
             break;
         }
-        i+=1;
+        n+=1;
     }
-
+    println!("{} blocks data has been imported",n);
     Ok(())
 }
