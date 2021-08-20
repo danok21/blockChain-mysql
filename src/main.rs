@@ -87,7 +87,7 @@ async fn main() -> web3::Result<()> {
                 //println!("Add {} records to the Tx table successfully! ", count);
             }
 
-            let sql2 = "INSERT INTO Head VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            let sql2 = "INSERT INTO Header VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             let count2 = sqlx::query(sql2).bind(hash).bind(parent_hash).bind(sha3_uncles).bind(miner).bind(state_root).bind(transactions_root)
                 .bind(receipts_root).bind(number).bind(gas_used).bind(gas_limit).bind(base_fee_per_gas).bind(extra_data).bind(logs_bloom).bind(timestamp)
                 .bind(difficulty).bind(total_difficulty).bind(transactions).bind(size).bind(mix_hash).bind(nonce).execute(&mut pool).await.unwrap();
