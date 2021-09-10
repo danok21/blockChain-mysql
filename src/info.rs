@@ -45,12 +45,12 @@ async fn main() -> web3::Result<()> {
         let timestamp = eth_block["timestamp"].as_str().unwrap();
         let difficulty = eth_block["difficulty"].as_str().unwrap();
         let total_difficulty = eth_block["totalDifficulty"].as_str().unwrap();
-        let seal_fields = "[]";
-        let uncles = "[]";
+        let seal_fields = "[]";//TODO
+        let uncles = "[]";//TODO
         let size = eth_block["size"].as_str().unwrap();
-        let mix_hash = "null";
-        let nonce = "null";
-        println!("{:?}",seal_fields);
+        let mix_hash = eth_block["mixHash"].as_str().unwrap_or("null");
+        let nonce = eth_block["nonce"].as_str().unwrap_or("null");
+
         let tx = eth_block["transactions"].as_array().unwrap();
 
         //block_tx
